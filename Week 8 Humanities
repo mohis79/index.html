@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 8 Room 5 Humanities</title>
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: #1f2833;
+            --panel-inner: #0f141c;
+            --text-main: #ffffff;
+            --text-muted: #c5a059;
+            --border-color: #45a29e;
+            --accent-gold: #ffb830;
+            --accent-g1: #ff5252;
+            --accent-g2: #ff793f;
+            --accent-g3: #33d9b2;
+            --accent-g4: #34ace0;
+            --accent-g5: #a29bfe;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+        
+        header { background: linear-gradient(135deg, #12161f, #1f2833); padding: 15px 25px; text-align: center; border-bottom: 4px solid var(--accent-gold); }
+        header h1 { font-size: 1.8rem; text-transform: uppercase; letter-spacing: 2px; color: #fff; }
+        header p { color: #66fcf1; font-size: 0.95rem; margin-top: 4px; font-weight: bold; letter-spacing: 1px; }
+
+        .day-selector { display: flex; justify-content: center; background-color: #0c0f14; padding: 10px; gap: 12px; border-bottom: 1px solid #2a3545; flex-wrap: wrap; }
+        .day-btn { background-color: #151b24; color: white; border: 2px solid transparent; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.88rem; transition: all 0.2s; }
+        .day-btn.active { background-color: var(--accent-gold); color: #000; border-color: #fff; box-shadow: 0 0 10px rgba(255, 184, 48, 0.4); }
+
+        .tabs { display: flex; justify-content: center; background-color: #121720; padding: 8px 0; gap: 8px; border-bottom: 1px solid #2a3545; flex-wrap: wrap; }
+        .tabs .tab-btn { background-color: #1c2331; color: #a2aab8; border: 2px solid transparent; padding: 8px 14px; font-size: 0.85rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .tabs .tab-btn[data-group="1"].active { border-color: var(--accent-g1); color: var(--accent-g1); background: rgba(255,82,82,0.15); }
+        .tabs .tab-btn[data-group="2"].active { border-color: var(--accent-g2); color: var(--accent-g2); background: rgba(255,121,63,0.15); }
+        .tabs .tab-btn[data-group="3"].active { border-color: var(--accent-g3); color: var(--accent-g3); background: rgba(51,217,178,0.15); }
+        .tabs .tab-btn[data-group="4"].active { border-color: var(--accent-g4); color: var(--accent-g4); background: rgba(52,172,224,0.15); }
+        .tabs .tab-btn[data-group="5"].active { border-color: var(--accent-g5); color: var(--accent-g5); background: rgba(162,155,254,0.15); }
+
+        .main-container { flex: 1; display: flex; gap: 15px; padding: 15px; max-width: 1600px; margin: 0 auto; width: 100%; }
+        .workspace { flex: 2.2; background-color: var(--card-bg); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; border-left: 10px solid transparent; transition: border-color 0.2s; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        
+        .slide-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2a3545; padding-bottom: 10px; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .slide-header h2 { font-size: 1.35rem; color: #fff; }
+        .roster-tag { font-size: 0.85rem; background-color: #0c0f14; padding: 5px 12px; border-radius: 4px; color: #cbd2e1; border: 1px solid #2a3545; line-height: 1.3; font-weight: bold; }
+        
+        .audio-controls { display: flex; align-items: center; gap: 10px; background: #121720; padding: 6px 12px; border-radius: 6px; border: 1px solid #2a3545; }
+        .audio-btn { border: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s; }
+        .audio-btn:hover { opacity: 0.9; }
+        .audio-btn.play { background-color: #2e86de; color: white; }
+        .audio-btn.stop { background-color: #ee5253; color: white; }
+
+        .waltham { background: #0f141c; padding: 14px; border-radius: 6px; font-size: 1rem; margin-bottom: 15px; border-left: 5px solid var(--accent-gold); line-height: 1.45; }
+        
+        .custom-text-panel { background: #1a222d; border: 1px solid #34495e; padding: 18px; border-radius: 6px; margin-bottom: 15px; line-height: 1.6; color: #eaeff5; font-size: 0.98rem; max-height: 280px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .custom-text-panel h4 { color: var(--accent-gold); margin-bottom: 10px; font-size: 1.1rem; border-bottom: 1px dashed #34495e; padding-bottom: 4px; }
+
+        .word-span { display: inline-block; padding: 0 2px; margin-right: 2px; border-radius: 3px; transition: all 0.1s ease; color: #eaeff5; }
+        .word-span.highlight { background-color: #ffb830 !important; color: #000000 !important; font-weight: bold; box-shadow: 0 0 8px #ffb830; transform: scale(1.05); }
+
+        .panel { background-color: var(--panel-inner); border: 1px solid #2a3545; border-radius: 6px; padding: 20px; margin-bottom: 15px; }
+        .panel h3 { font-size: 1.1rem; margin-bottom: 12px; padding-bottom: 5px; border-bottom: 1px solid #2a3545; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 0.5px; }
+        .panel li { margin-bottom: 12px; font-size: 0.95rem; line-height: 1.5; color: #e1e4ed; list-style-position: inside; }
+        
+        .links-box { background: rgba(52, 172, 224, 0.1); border: 1px dashed var(--accent-g4); padding: 15px; border-radius: 6px; font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+        .links-box a { color: #71c1ff; font-weight: bold; text-decoration: none; padding: 4px 8px; background: rgba(255,255,255,0.05); border-radius: 4px; border: 1px solid rgba(113, 193, 255, 0.2); transition: all 0.2s; }
+        .links-box a:hover { background: rgba(113, 193, 255, 0.2); transform: translateY(-1px); }
+
+        .sidebar { flex: 1.1; background-color: var(--card-bg); border-radius: 8px; padding: 18px; border-top: 5px solid var(--accent-gold); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .sidebar h2 { font-size: 1.05rem; color: #fff; text-transform: uppercase; border-bottom: 2px solid #2a3545; padding-bottom: 6px; text-align: center; }
+        
+        .book-mockup { background-color: #fffdf5; border-radius: 4px; box-shadow: inset 0 0 20px rgba(0,0,0,0.08), 3px 3px 10px rgba(0,0,0,0.25); padding: 15px 15px; color: #222; position: relative; border-left: 6px solid #e67e22; flex: 1; display: flex; flex-direction: column; min-height: 290px; max-height: 350px; }
+        .book-mockup .margin-line { position: absolute; left: 25px; top: 0; bottom: 0; width: 1px; background-color: #ff7675; }
+        .book-mockup .notebook-line { border-bottom: 1px solid #b2bec3; height: 26px; line-height: 26px; font-size: 0.75rem; padding-left: 15px; position: relative; white-space: nowrap; overflow: hidden; }
+        
+        .book-mockup .date-text { color: #2d3436; font-weight: 600; display: inline-block; border-bottom: 2px solid #ff4d4d; padding-bottom: 1px; line-height: 1.1; }
+        .book-mockup .title-text { font-weight: bold; border-bottom: 1.5px solid #2d3436; text-transform: uppercase; font-size: 0.78rem; padding-bottom: 1px; }
+        .book-mockup .question-text { color: #2d3436; font-weight: 500; }
+        .book-mockup .answer-prompt { color: #0984e3; font-style: italic; font-size: 0.70rem; }
+        .book-mockup .drawing-container { border: 1px dashed #636e72; background: #fff; height: 42px; width: 110px; margin: 6px 0 2px 15px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #636e72; font-weight: bold; text-transform: uppercase; border-radius: 4px; align-self: flex-start; }
+
+        footer { text-align: center; padding: 10px; background-color: #0c0f14; font-size: 0.75rem; color: #62687f; border-top: 1px solid #2a3545; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Week 8 Room 5 Humanities</h1>
+        <p>INDEPENDENT READING COMPREHENSION</p>
+    </header>
+
+    <div class="day-selector">
+        <button class="day-btn active" onclick="setDay('Tue')">Tuesday</button>
+        <button class="day-btn" onclick="setDay('Wed')">Wednesday</button>
+        <button class="day-btn" onclick="setDay('Thu')">Thursday</button>
+        <button class="day-btn" onclick="setDay('Fri')">Friday</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-group="1" onclick="setGroup(1)">Group 1</button>
+        <button class="tab-btn" data-group="2" onclick="setGroup(2)">Group 2</button>
+        <button class="tab-btn" data-group="3" onclick="setGroup(3)">Group 3</button>
+        <button class="tab-btn" data-group="4" onclick="setGroup(4)">Group 4</button>
+        <button class="tab-btn" data-group="5" onclick="setGroup(5)">Group 5</button>
+    </div>
+
+    <div class="main-container">
+        <div class="workspace" id="workspace-block">
+            <div class="slide-header">
+                <h2 id="slide-title">Loading Layout...</h2>
+                <div class="roster-tag" id="slide-roster">Roster Loading...</div>
+                
+                <div class="audio-controls">
+                    <button class="audio-btn play" onclick="speakContent()">🔊 Play Text Audio</button>
+                    <button class="audio-btn stop" onclick="stopContent()">🛑 Stop</button>
+                </div>
+            </div>
+            
+            <div class="waltham" id="slide-waltham">WALT Statement loading...</div>
+            
+            <div id="text-passage-container"></div>
+
+            <div class="panel">
+                <h3>📖 Write Questions & Answer in Sentences</h3>
+                <div id="panel-tasks">Questions loading...</div>
+            </div>
+
+            <div class="links-box" id="panel-links">
+                <strong>🔗 Assignment Resources:</strong> 
+                <span id="text-link-container"></span>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h2>📚 Notebook Rule</h2>
+            <div class="book-mockup">
+                <div class="margin-line"></div>
+                <div class="notebook-line"><span class="date-text" id="mock-date-box">Tuesday Date</span></div>
+                <div class="notebook-line"></div>
+                <div class="notebook-line" style="text-align: center; padding-left: 0;"><span class="title-text" id="mock-title-box">TEXT TITLE</span></div>
+                <div class="notebook-line"></div>
+                <div class="notebook-line"><span class="question-text">1. Copy full question 1 here?</span></div>
+                <div class="notebook-line"><span class="answer-prompt">Your full sentence answer here.</span></div>
+                <div class="notebook-line"><span class="question-text">2. Copy full question 2 here?</span></div>
+                <div class="notebook-line"><span class="answer-prompt">Your full sentence answer here.</span></div>
+                <div class="drawing-container" id="mock-drawing-box">Margin Sketch</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>Manurewa Intermediate School • Room 5 Humanities 2026</footer>
+
+    <script>
+        let currentDay = 'Tue';
+        let currentGroup = 1;
+        let isPlaying = false;
+        let currentWordIndex = 0;
+        let storyWords = [];
+
+        const rosters = {
+            1: "Sione 6.09, Kalala 6.07, Aaleyah 6.03, Robert 6.00, Ramona 9.00",
+            2: "Antonio 8.01, Boston 8.07, Beaver 8.08, Ariellyn 8.02, Joe, Taira 8.00",
+            3: "Richard 9.01, Conellius 9.01, Fusi 9.05, Nare 9.07, Natalia 9.05, James 9.05, Jett 9.07, Te Haina 9.03, Mathew 9.05",
+            4: "Amaia 10, Luther 10, Limani 10.03, Zach 10.03",
+            5: "Alenna 11.06, Taofi 11.02, Khan 11.02, Dante 11.06"
+        };
+
+        const accentColors = {
+            1: 'var(--accent-g1)', 2: 'var(--accent-g2)', 3: 'var(--accent-g3)', 4: 'var(--accent-g4)', 5: 'var(--accent-g5)'
+        };
+
+        // Fixed date configurations mapping to June 2026 dates
+        const fullDates = { 
+            'Tue': 'Tuesday 9th June 2026', 
+            'Wed': 'Wednesday 10th June 2026', 
+            'Thu': 'Thursday 11th June 2026', 
+            'Fri': 'Friday 12th June 2026' 
+        };
+
+        const customizedTexts = {
+            g1: {
+                tue: {
+                    title: "The Whispering Cave",
+                    body: "Deep inside the green hills of the North Island, Tane and Hani found a hidden opening covered by thick silver ferns. The elders always told them stories about this place, calling it the Whispering Cave. As they stepped onto the damp, rocky floor, the cool air smelled of moss and clean rain. The sound of deep dripping water echoed like a slow heartbeat. Tane shone his small flashlight against the curved stone walls, revealing strange, shimmering grey patterns that moved whenever the light caught them. Suddenly, a soft rushing sound echoed from the dark tunnels ahead, sounding exactly like wind passing through tall trees. Hani held her breath and pointed toward the back of the cave. Two glowing green eyes were blinking slowly from a high ledge, watching them closely."
+                },
+                wed: {
+                    title: "The Echo Valley",
+                    body: "The next morning, the fog hung low over the valley floor as the team walked down the narrow dirt pathway. Echo Valley was famous for its strange behavior with sound. If you clapped your hands once, the sharp crack would bounce off the tall black cliffs five or six times, getting louder instead of softer. Ana carried a small wooden compass in her palm, watching the red needle turn in circles as they drew closer to the center of the valley. The iron rocks beneath their boots were playing tricks with the magnetic field. Suddenly, the ground rumbled quietly, and a line of ancient stone blocks rose slightly above the overgrown grass, blocking their path like a locked castle gate."
+                },
+                thufri: {
+                    title: "The Secret Map",
+                    body: "By Thursday afternoon, the sky had turned a dark slate gray, bringing a cool breeze across the school courtyard. Tane, Hani, and Ana gathered at the corner desk with a torn sheet of grid paper spread out flat between them. It was a secret map left over from their unfinished tasks earlier in the week. Small blue ink markings pointed directly toward a hidden drainage panel near the sports fields. They knew they had to work together quickly before the final bell rang on Friday. Hani traced the path with her finger, noting that two key clues were still completely missing from their notes. With only twenty minutes left in the lesson block, the team sharpened their pencils and set out to find the remaining data points."
+                }
+            },
+            g2: {
+                tue: {
+                    title: "The Lost Compass",
+                    body: "Ben looked closely down into the thick, twisted roots of the large pohutukawa tree. Halfway buried in the dark soil was a round brass object catching the morning sun. It was an old pocket compass, but it looked different from modern ones. The glass cover was heavily scratched, and ancient patterns were carved around the outer rim. When Ben picked it up, the cool metal felt heavy in his hands. He wiped away the sticky black dirt and noticed that the needle wasn't pointing north at all. Instead, it was locked onto a high, rocky hill far off in the distance, where smoke was beginning to rise slowly into the clear blue sky."
+                },
+                wed: {
+                    title: "The Message in the Tree",
+                    body: "Keanu and Tai raced down towards the edge of the river boundary, their shoes tracking mud across the flat rocks. They always used a massive, hollow kahikatea tree as their secret meeting base. Today, something was different. Tucked deep inside a natural split in the pale bark was a small roll of thick, coarse brown paper tied up with a piece of rough flax rope. Keanu untied the knot carefully, ensuring the fragile paper didn't tear. Inside, there were no typed words. Instead, someone had drawn a detailed map of the winding riverbanks with a bold red cross marked right over the old wooden jetty down at the delta."
+                },
+                thufri: {
+                    title: "The Secret Map",
+                    body: "By Thursday afternoon, the sky had turned a dark slate gray, bringing a cool breeze across the school courtyard. Ben, Keanu, and Tai gathered at the corner desk with a torn sheet of grid paper spread out flat between them. It was a secret map left over from their unfinished tasks earlier in the week. Small blue ink markings pointed directly toward a hidden drainage panel near the sports fields. They knew they had to work together quickly before the final bell rang on Friday. Keanu traced the path with her finger, noting that two key clues were still completely missing from their notes. With only twenty minutes left in the lesson block, the team sharpened their pencils and set out to find the remaining data points."
+                }
+            }
+        };
+
+        const romeoQuestions = `
+            <ol style="padding-left:20px;">
+                <li>Who are the primary characters or families introduced in these scenes?</li>
+                <li>Describe the setting details and explain how they construct the tense atmosphere of the play.</li>
+                <li>Locate and copy down one specific sentence or quote that highlights the main family conflict.</li>
+                <li>Analyze how personal choices and family expectations clash or impact the main characters.</li>
+                <li>What choice is made by the characters here, and what reasons or motives did they have for doing so?</li>
+                <li>How do individual side characters respond to the core tension brewing between the primary families?</li>
+                <li>What structural clues inside the dialogue show that a major dispute is unavoidable?</li>
+                <li>In your own words, outline what the characters stand to lose if their choices are exposed.</li>
+                <li>How does the tone of the conversations shift from the beginning of the passage to the end?</li>
+                <li>Predict what consequences will follow these decisions in the upcoming scenes based on text clues.</li>
+            </ol>`;
+
+        const betweenTwoWorldsQuestions = `
+            <ol style="padding-left:20px;">
+                <li>Identify the primary historical figures or groups highlighted in this text narrative.</li>
+                <li>In what ways do the text's environments show the intersections of European settlement and Māori culture?</li>
+                <li>Find and copy down a sentence highlighting how these two distinct communities interact.</li>
+                <li>What direct actions do the collective groups or figures take to manage this new shared landscape?</li>
+                <li>What does this text evaluate about the long-term impact of collective choices on identity and culture?</li>
+                <li>What specific resources or pieces of land are central to the disputes highlighted in the text?</li>
+                <li>How do differences in cultural systems generate misunderstandings between the two groups?</li>
+                <li>Identify any agreements or compromises that are attempted within the text narrative.</li>
+                <li>How do the historical figures express their feelings toward the rapidly changing societal landscape?</li>
+                <li>What core lesson does this historical text present about cooperation versus conflict?</li>
+            </ol>`;
+
+        function formatTextToSpans(text) {
+            storyWords = text.split(' ');
+            return storyWords.map((word, idx) => `<span class="word-span" id="word-${idx}">${word}</span>`).join(' ');
+        }
+
+        function setDay(day) {
+            stopContent();
+            currentDay = day;
+            document.querySelectorAll('.day-selector .day-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderBlock();
+        }
+
+        function setGroup(groupNum) {
+            stopContent();
+            currentGroup = groupNum;
+            document.querySelectorAll('.tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tabs .tab-btn[data-group="${groupNum}"]`).classList.add('active');
+            renderBlock();
+        }
+
+        function renderBlock() {
+            const workspace = document.getElementById('workspace-block');
+            const mockDate = document.getElementById('mock-date-box');
+            const mockTitle = document.getElementById('mock-title-box');
+            const mockDrawing = document.getElementById('mock-drawing-box');
+            const linkBox = document.getElementById('text-link-container');
+            const panelTasks = document.getElementById('panel-tasks');
+            const passageBox = document.getElementById('text-passage-container');
+            
+            workspace.style.borderColor = accentColors[currentGroup];
+            document.getElementById('slide-roster').innerHTML = `<strong>Roster:</strong> ${rosters[currentGroup]}`;
+            passageBox.innerHTML = ""; 
+            mockDrawing.style.display = "none";
+            mockDate.innerText = fullDates[currentDay];
+
+            if (currentGroup === 1 || currentGroup === 2) {
+                const groupKey = 'g' + currentGroup;
+                let dayKey = currentDay.toLowerCase();
+                if (dayKey === 'thu' || dayKey === 'fri') dayKey = 'thufri';
+                
+                const textData = customizedTexts[groupKey][dayKey];
+                passageBox.innerHTML = `<div class="custom-text-panel"><h4>📖 ${textData.title}</h4><p id="tts-body">${formatTextToSpans(textData.body)}</p></div>`;
+                document.getElementById('slide-title').innerText = `Group ${currentGroup} - ${textData.title}`;
+                mockTitle.innerText = textData.title.toUpperCase();
+                
+                if (currentDay === 'Tue') {
+                    document.getElementById('slide-waltham').innerHTML = `<strong>WALT:</strong> Extract explicit details and demonstrate literal comprehension.`;
+                    linkBox.innerHTML = `<span>Text and questions are displayed below</span>`;
+                    panelTasks.innerHTML = currentGroup === 1 ? `
+                        <ol style="padding-left:20px;">
+                            <li>Where exactly did Tane and Hani find the hidden opening?</li>
+                            <li>What type of foliage was covering the cave's entrance?</li>
+                            <li>What name did the community elders use when referring to this location?</li>
+                            <li>List two descriptive conditions of the cave environment upon entering.</li>
+                            <li>What did the sound of the deep dripping water resemble?</li>
+                            <li>What device did Tane use to illuminate the stone walls?</li>
+                            <li>What color patterns were revealed when the light caught the stone?</li>
+                            <li>What did the soft rushing sound echo from the dark tunnels sound like?</li>
+                            <li>Who pointed toward the back of the cave when the rushing sound occurred?</li>
+                            <li>Describe the appearance and movement of the entity watching them from the ledge.</li>
+                        </ol>` : `
+                        <ol style="padding-left:20px;">
+                            <li>Ben looked closely down into the roots of which type of tree?</li>
+                            <li>What object caught the reflection of the morning sun rays?</li>
+                            <li>What was wrong with the glass cover component of the object?</li>
+                            <li>What engravings were located around the outer rim of the tool?</li>
+                            <li>Where exactly was the compass tracking needle locked onto?</li>
+                            <li>Where was the brass object partially buried when discovered?</li>
+                            <li>How did the compass feel in Ben's hands when he first picked it up?</li>
+                            <li>What substance did Ben have to wipe away to see the face of the compass?</li>
+                            <li>What cardinal direction was the needle completely failing to point toward?</li>
+                            <li>What could be seen rising slowly into the sky from the distant hill?</li>
+                        </ol>`;
+                } else if (currentDay === 'Wed') {
+                    document.getElementById('slide-waltham').innerHTML = `<strong>WALT:</strong> Locate key information and summarize explicit story plots.`;
+                    linkBox.innerHTML = `<span>Text and questions are displayed below</span>`;
+                    panelTasks.innerHTML = currentGroup === 1 ? `
+                        <ol style="padding-left:20px;">
+                            <li>What weather condition hung low over the valley floor in the morning?</li>
+                            <li>What feature was Echo Valley famous for among the local community?</li>
+                            <li>What occurs to a handclap sound when it strikes the black cliff sides?</li>
+                            <li>What item was Ana carrying directly in the palm of her hand?</li>
+                            <li>What was the red compass needle doing as they approached the center point?</li>
+                            <li>What specific path were the team walking down during the morning?</li>
+                            <li>How many times would the crack of a handclap bounce off the cliffs?</li>
+                            <li>What type of material was Ana's compass constructed from?</li>
+                            <li>What kind of rock layers beneath their boots messed with the magnetism?</li>
+                            <li>What concrete barrier rose up to block their pathway like a castle gate?</li>
+                        </ol>` : `
+                        <ol style="padding-left:20px;">
+                            <li>Name the two characters who were racing toward the river boundary.</li>
+                            <li>What giant hollow tree species served as their secret base layout?</li>
+                            <li>What was tucked safely deep inside a natural split in the bark?</li>
+                            <li>What material was used to tie up the roll of coarse brown paper?</li>
+                            <li>What was drawn inside the paper layout instead of typed words?</li>
+                            <li>What were the boys' shoes tracking across the flat riverbed rocks?</li>
+                            <li>How is the condition of the kahikatea tree described in the text?</li>
+                            <li>What physical quality did the paper roll possess when extracted?</li>
+                            <li>Which character carefully untied the knot to prevent tearing?</li>
+                            <li>Where exactly was the bold red cross marked on the illustration?</li>
+                        </ol>`;
+                } else {
+                    document.getElementById('slide-waltham').innerHTML = `<strong>WALT:</strong> Consolidate explicit details to complete unfinished reading tasks.`;
+                    panelTasks.innerHTML = `
+                        <ol style="padding-left:20px;">
+                            <li>What specific color did the sky change into by Thursday afternoon?</li>
+                            <li>What item was spread out completely flat across the corner desk space?</li>
+                            <li>Where exactly were the small blue ink markings on the map pointing toward?</li>
+                            <li>How many distinct data clues are noted as still missing from their log notes?</li>
+                            <li>Exactly how many minutes were left in the lesson block to find the remaining data?</li>
+                            <li>What environmental element accompanied the dark gray skies across the courtyard?</li>
+                            <li>Name all the students who gathered together around the corner desk layout.</li>
+                            <li>What specific type of paper was used to sketch out the map guidelines?</li>
+                            <li>When did the group need to finish this collaborative mapping workflow?</li>
+                            <li>What tool did the team sharpen before heading out to capture the final points?</li>
+                        </ol>`;
+                    linkBox.innerHTML = `<a href="https://bairdcallumj-alt.github.io/strong/" target="_blank">💪 Hercules Link</a> | 
+                                         <a href="https://bairdcallumj-alt.github.io/wars/" target="_blank">⚔️ Land Wars Link</a> | 
+                                         <a href="https://mohis79.github.io/Week-7-Humanities-Slides/" target="_blank">📊 Group Taskboard Slides</a>`;
+                }
+                return;
+            }
+
+            if (currentGroup === 3 || currentGroup === 4 || currentGroup === 5) {
+                if (currentDay === 'Tue' || currentDay === 'Wed') {
+                    document.getElementById('slide-title').innerText = `Group ${currentGroup} - Romeo and Juliet`;
+                    document.getElementById('slide-waltham').innerHTML = `<strong>WALT:</strong> Deconstruct dramatic character choices and analyze conflicting family motives.`;
+                    mockTitle.innerText = "ROMEO & JULIET";
+                    panelTasks.innerHTML = romeoQuestions;
+                    linkBox.innerHTML = `<a href="https://bairdcallumj-alt.github.io/romeo/" target="_blank">🎭 Launch Interactive Romeo & Juliet Resource</a> | 
+                                         <a href="https://mohis79.github.io/Week-7-Humanities-Slides/" target="_blank">📊 Group Taskboard Slides</a>`;
+                } else {
+                    document.getElementById('slide-title').innerText = `Group ${currentGroup} - Between Two Worlds`;
+                    document.getElementById('slide-waltham').innerHTML = `<strong>WALT:</strong> Evaluate historical perspectives and the impact of cultural synthesis.`;
+                    mockTitle.innerText = "BETWEEN TWO WORDS";
+                    panelTasks.innerHTML = betweenTwoWorldsQuestions + `<p style="margin-top: 10px; border-top: 1px dashed #2a3545; padding-top: 5px; color: #66fcf1; font-size:0.85rem;"><strong>🎨 Margin Task:</strong> Draw a neat visual sketch illustrating a key historical interaction moment.</p>`;
+                    mockDrawing.style.display = "flex"; 
+                    linkBox.innerHTML = `<a href="https://bairdcallumj-alt.github.io/nzmaori/" target="_blank">🌍 Launch Between Two Worlds Resource</a> | 
+                                         <a href="https://mohis79.github.io/Week-7-Humanities-Slides/" target="_blank">📊 Group Taskboard Slides</a>`;
+                }
+            }
+        }
+
+        function speakContent() {
+            stopContent();
+            isPlaying = true;
+            
+            let metaSpeech = "";
+            const title = document.getElementById('slide-title').innerText;
+            const waltham = document.getElementById('slide-waltham').innerText;
+            metaSpeech += `${title}. ${waltham}. `;
+
+            const textPanel = document.getElementById('tts-body');
+            
+            if (textPanel && storyWords.length > 0) {
+                const metaUtterance = new SpeechSynthesisUtterance(metaSpeech + "Please follow along with the highlighted text block.");
+                setUKFemaleVoice(metaUtterance);
+                metaUtterance.rate = 1.02;
+                
+                metaUtterance.onend = () => {
+                    if (isPlaying) {
+                        currentWordIndex = 0;
+                        speakWordSequentially();
+                    }
+                };
+                window.speechSynthesis.speak(metaUtterance);
+            } else {
+                let fallbackText = metaSpeech;
+                document.querySelectorAll('#panel-tasks li').forEach((li, idx) => {
+                    fallbackText += `Question ${idx + 1}. ${li.innerText}. `;
+                });
+                const fallbackUtterance = new SpeechSynthesisUtterance(fallbackText);
+                setUKFemaleVoice(fallbackUtterance);
+                fallbackUtterance.rate = 1.02;
+                window.speechSynthesis.speak(fallbackUtterance);
+            }
+        }
+
+        function speakWordSequentially() {
+            if (!isPlaying || currentWordIndex >= storyWords.length) {
+                document.querySelectorAll('.word-span').forEach(s => s.classList.remove('highlight'));
+                if (isPlaying) speakQuestionsFlow();
+                return;
+            }
+
+            document.querySelectorAll('.word-span').forEach(s => s.classList.remove('highlight'));
+            
+            const targetWord = document.getElementById(`word-${currentWordIndex}`);
+            if (targetWord) {
+                targetWord.classList.add('highlight');
+                targetWord.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            const wordUtterance = new SpeechSynthesisUtterance(storyWords[currentWordIndex]);
+            setUKFemaleVoice(wordUtterance);
+            wordUtterance.rate = 1.08; 
+
+            wordUtterance.onend = () => {
+                currentWordIndex++;
+                speakWordSequentially();
+            };
+
+            wordUtterance.onerror = () => {
+                currentWordIndex++;
+                speakWordSequentially();
+            };
+
+            window.speechSynthesis.speak(wordUtterance);
+        }
+
+        function speakQuestionsFlow() {
+            let questionsText = "Now, listen carefully to your ten comprehension questions. ";
+            document.querySelectorAll('#panel-tasks li').forEach((li, idx) => {
+                questionsText += `Question ${idx + 1}. ${li.innerText}. `;
+            });
+            const questionsUtterance = new SpeechSynthesisUtterance(questionsText);
+            setUKFemaleVoice(questionsUtterance);
+            questionsUtterance.rate = 1.02;
+            window.speechSynthesis.speak(questionsUtterance);
+        }
+
+        function setUKFemaleVoice(utterance) {
+            if (typeof speechSynthesis !== 'undefined') {
+                const voices = speechSynthesis.getVoices();
+                const ukFemale = voices.find(v => 
+                    v.lang.toLowerCase().includes('en-gb') && 
+                    (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('hazel') || v.name.toLowerCase().includes('google') || v.name.toLowerCase().includes('susan'))
+                ) || voices.find(v => v.lang.toLowerCase().includes('en-gb'));
+                
+                if (ukFemale) utterance.voice = ukFemale;
+            }
+        }
+
+        function stopContent() {
+            isPlaying = false;
+            window.speechSynthesis.cancel();
+            document.querySelectorAll('.word-span').forEach(s => s.classList.remove('highlight'));
+        }
+
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = renderBlock;
+        }
+        renderBlock();
+    </script>
+</body>
+</html>
